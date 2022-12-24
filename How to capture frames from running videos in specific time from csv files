@@ -1,0 +1,46 @@
+import cv2
+import csv
+import os
+
+with open('sheet.csv', 'r') as f:           #open the sheet
+    csv_reader =csv.reader(f, delimiter= ",")
+    next(csv_reader)  # skip the header
+
+    for row in csv_reader:                  # defining rows
+        id = str(row[0])
+        type = str(row[1])
+        name = str(row[3])
+        brand = str(row[4])
+        video_name = str(row[6])
+        minutes = int(row[8])
+        seconds = int(row[9])
+        zone= str(row[10])
+        area= str(row[11])
+        t_msec = 1000*(minutes*60+seconds)    #converting time to millsecondes
+
+
+        directory = r'G:\backup 19-5-2020\videos\11-2022'     #Directory of your video files and make a list of each file name
+        list_of_files = os.listdir(directory)
+        for v_file in list_of_files:
+            video = cv2.VideoCapture(video_name)              #matching the name in the list with the cell in your csv row by row
+            video.set(cv2.CAP_PROP_POS_MSEC, float(t_msec))
+
+            if video.isOpened():
+                ret, frame = video.read()
+                if ret and '.MOV' in v_file == video_name:    #put a text on your captchered frame if you wish
+                   
+                    frame = cv2.putText(
+                        img=frame,
+                        text=str(name + '/' + brand + '/' + type + ' @' + zone + '_' + area),
+                        org=(10,1000),
+                        fontFace=cv2.FONT_HERSHEY_DUPLEX,
+                        fontScale=1.0,
+                        color=(125, 246, 55),
+                        thickness=1
+                    )
+                    cv2.imwrite('{}_11_2022.jpg'.format(id),frame)
+                    break
+
+
+video.release()
+cv2.destroyAllWindows()
